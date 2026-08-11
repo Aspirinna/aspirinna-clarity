@@ -38,7 +38,9 @@ const list = computed(() =>
 			</div>
 		</header>
 
-		<p class="content">{{ item.content }}</p>
+		<p class="content">
+			{{ item.content }}
+		</p>
 
 		<div v-if="item.images?.length" class="images">
 			<ContentPic
