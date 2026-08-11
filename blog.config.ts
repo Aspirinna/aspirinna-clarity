@@ -73,7 +73,10 @@ const blogConfig = {
 
 	/** 向 <head> 中添加脚本 */
 	scripts: [
-		{ src: 'https://cdnjs.snrat.com/ajax/libs/twikoo/1.7.13/twikoo.min.js', defer: true },
+		{
+			src: 'https://registry.npmmirror.com/twikoo/1.7.15/files/dist/twikoo.min.js',
+			defer: true,
+		},
 	],
 
 	/** 自己部署的 Twikoo 服务 */
