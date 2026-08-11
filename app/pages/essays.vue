@@ -86,22 +86,22 @@ const list = computed(() =>
 	}
 
 	.content {
-		white-space: pre-wrap;
 		line-height: 1.8;
+		white-space: pre-wrap;
 	}
 
 	.images {
 		display: grid;
-		gap: 0.5rem;
 		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: 0.5rem;
 	}
 
 	footer {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.75rem;
-		color: var(--c-text-2);
 		font-size: 0.85em;
+		color: var(--c-text-2);
 	}
 }
 </style>
