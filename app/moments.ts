@@ -9,7 +9,7 @@ export interface MomentItem {
 export const moments: MomentItem[] = [
 	{
 		content: '博客的评论系统终于部署完成了...发一下好久之前的摄影测试一下。',
-		createdAt: '2026-08-11T20:00:00+08:00',
+		createdAt: '2025-08-11T20:00:00+08:00',
 		images: [
 			'https://img.aspirinna.cloud/posts/20260811185228297.png',
 		],
