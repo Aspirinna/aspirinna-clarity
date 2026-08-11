@@ -8,6 +8,9 @@ const props = defineProps<FeedEntry>()
 const appConfig = useAppConfig()
 const route = useRoute()
 const isInspect = computed(() => import.meta.dev && route.query.inspect !== undefined)
+function formatFeedDate(date: string) {
+	return Temporal.PlainDate.from(date).toLocaleString()
+}
 
 const title = computed(() => props.title ?? props.sitenick ?? props.author)
 const domainTip = computed(() => getDomainType(getMainDomain(props.link, true)))
@@ -78,7 +81,7 @@ function getInspectStyle(src: string): CSSProperties {
 		</div>
 		<div class="desc-content">
 			<div class="date">
-				{{ Temporal.PlainDate.from(date).toLocaleString() }}
+				{{ formatFeedDate(date) }}
 			</div>
 
 			<p>{{ error ?? desc }}</p>

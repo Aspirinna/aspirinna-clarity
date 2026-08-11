@@ -23,6 +23,6 @@ export default [
 			// 	date: '2023-12-23',
 			// 	comment: 'deadlock老资历...',
 			// },
-		]
-	}
+		],
+	},
 ] satisfies FeedGroup[]

@@ -11,14 +11,14 @@
 	</div>
 
 	<a
-	class="bilibili-link"
-	href="https://space.bilibili.com/3494364785412496"
-	target="_blank"
-	rel="noopener noreferrer"
->
-	<Icon name="ant-design:bilibili-filled" />
-	<span>访问我的 Bilibili 主页</span>
-</a>
+		class="bilibili-link"
+		href="https://space.bilibili.com/3494364785412496"
+		target="_blank"
+		rel="noopener noreferrer"
+	>
+		<Icon name="ant-design:bilibili-filled" />
+		<span>访问我的 Bilibili 主页</span>
+	</a>
 </BlogWidget>
 </template>
 

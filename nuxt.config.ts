@@ -25,7 +25,7 @@ export default defineNuxtConfig({
 				{ name: 'mobile-web-app-capable', content: 'yes' },
 			],
 			link: [
-				{ rel: 'icon', href: blogConfig.favicon },
+				{ rel: 'icon', type: 'image/vnd.microsoft.icon', href: blogConfig.favicon },
 				{ rel: 'alternate', type: 'application/atom+xml', href: '/atom.xml' },
 				{ rel: 'preconnect', href: blogConfig.twikoo.preload },
 				{ rel: 'stylesheet', href: 'https://cdnjs.snrat.com/ajax/libs/KaTeX/0.16.44/katex.min.css' },
@@ -83,7 +83,6 @@ export default defineNuxtConfig({
 		...mapValues(redirectList, to => ({ redirect: { to, statusCode: 308 as const } })),
 		'/api/stats': { prerender: true, headers: { 'Content-Type': 'application/json' } },
 		'/atom.xml': { prerender: true, headers: { 'Content-Type': 'application/xml' } },
-		'/favicon.ico': { redirect: { to: blogConfig.favicon } },
 		'/subscriptions.opml': { prerender: true, headers: { 'Content-Type': 'application/xml' } },
 	},
 

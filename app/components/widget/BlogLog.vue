@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const { timeEstablished } = useAppConfig()
-
 const blogLog = [
 	{ label: '2026-08-11', value: '迁移至 Nuxt 4 Clarity 主题' },
 ]
