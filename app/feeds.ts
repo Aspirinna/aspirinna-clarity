@@ -9,7 +9,7 @@ export default [
 	},
 	{
 		name: '友链',
-		desc: 'Aspirinna 的友链列表。',
+		desc: 'Aspirinna 的友链列表，现在还是空的...',
 		entries: [
 			// {
 			// 	author: 'AC丿official',
