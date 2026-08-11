@@ -1,7 +1,7 @@
 import { resolve } from 'node:path'
 import { arch, env, version as nodeVersion, platform } from 'node:process'
 import { pathToFileURL } from 'node:url'
-import { name as ciName, CLOUDFLARE_PAGES, GITHUB_ACTIONS, NETLIFY } from 'ci-info'
+import { name as ciName, CLOUDFLARE_PAGES, NETLIFY } from 'ci-info'
 import { mapValues } from 'es-toolkit/object'
 import { pascalCase } from 'es-toolkit/string'
 import { Temporal } from 'temporal-polyfill'
@@ -74,7 +74,7 @@ export default defineNuxtConfig({
 		prerender: {
 			// 修复部分平台会在文章路径后添加 `/`，导致闪现 404 错误
 			// https://github.com/nuxt/content/issues/2378
-			autoSubfolderIndex: CLOUDFLARE_PAGES || GITHUB_ACTIONS || NETLIFY ? false : undefined,
+			autoSubfolderIndex: CLOUDFLARE_PAGES || NETLIFY ? false : undefined,
 		},
 	},
 

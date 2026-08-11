@@ -1,26 +1,26 @@
 import type { FeedEntry } from './app/types/feed'
 
 const basicConfig = {
-	title: '博客',
-	subtitle: '博客',
+	title: 'Aspirinna',
+	subtitle: '日常 / 技术学习',
 	// 长 description 利好于 SEO
-	description: '博客',
+	description: 'Aspirinna的个人站，可能放点乱七八糟的东西在这',
 	author: {
-		name: '博客',
-		avatar: 'https://www.example.site/api/avatar.png',
-		email: 'hi@example.cyou',
-		homepage: 'https://www.example.site/',
+		name: 'Aspirinna',
+		avatar: 'https://img.aspirinna.cloud/posts/20260811134544747.png',
+		email: 'aspirinna200505@gmail.com',
+		homepage: 'https://aspirinna.online/',
 	},
 	copyright: {
 		abbr: 'CC BY-NC-SA 4.0',
 		name: '署名-非商业性使用-相同方式共享 4.0 国际',
 		url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans',
 	},
-	favicon: 'https://www.example.site/api/icon.png',
+	favicon: 'https://img.aspirinna.cloud/posts/20260811162810223.ico',
 	language: 'zh-CN',
-	timeEstablished: '2019-07-19',
+	timeEstablished: '2026-08-10',
 	timeZone: 'Asia/Shanghai',
-	url: 'https://blog.example.site/',
+	url: 'https://aspirinna.online/',
 	defaultCategory: '未分类',
 }
 
@@ -73,34 +73,29 @@ const blogConfig = {
 
 	/** 向 <head> 中添加脚本 */
 	scripts: [
-		// 自己部署的 Umami 统计服务
-		{ 'src': 'https://zhi.example.site/zhi.js', 'data-website-id': 'a1997c81-a42b-46f6-8d1d-8fbd67a8ef41', 'defer': true },
-		// 自己网站的 Cloudflare Insights 统计服务
-		{ 'src': 'https://static.cloudflareinsights.com/beacon.min.js', 'data-cf-beacon': '{"token": "97a4fe32ed8240ac8284e9bffaf03962"}', 'defer': true },
-		// Twikoo 评论系统
 		{ src: 'https://cdnjs.snrat.com/ajax/libs/twikoo/1.7.13/twikoo.min.js', defer: true },
 	],
 
 	/** 自己部署的 Twikoo 服务 */
 	twikoo: {
-		envId: 'https://twikoo.example.site/',
-		preload: 'https://twikoo.example.site/',
+		envId: 'https://comments.aspirinna.online/',
+		preload: 'https://comments.aspirinna.online/',
 	},
 }
 
 /** 用于生成 OPML 和友链页面配置 */
 export const myFeed: FeedEntry = {
 	author: blogConfig.author.name,
-	sitenick: '摸鱼处',
+	sitenick: '脊蕈',
 	title: blogConfig.title,
 	desc: blogConfig.subtitle || blogConfig.description,
 	link: blogConfig.url,
 	feed: new URL('/atom.xml', blogConfig.url).toString(),
 	icon: blogConfig.favicon,
 	avatar: blogConfig.author.avatar,
-	archs: ['Nuxt', 'Vercel'],
+	archs: ['Nuxt', 'OpenResty'],
 	date: blogConfig.timeEstablished,
-	comment: '这是我自己',
+	comment: 'Aspirinna 的个人博客',
 }
 
 export default blogConfig

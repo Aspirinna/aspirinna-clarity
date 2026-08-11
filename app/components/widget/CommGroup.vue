@@ -2,18 +2,23 @@
 <BlogWidget
 	card
 	dim
-	title="博客/技术社区"
-	bg-img="https://p.qlogo.cn/gh/169994096/169994096/100/"
+	title="bilibili"
+	bg-img="https://img.aspirinna.cloud/posts/20260811133231829.png"
 	bg-aside
 >
 	<div class="title text-creative">
-		纸网接入点
+		脊蕈
 	</div>
 
-	<Tip copy icon :tip-options="{ placement: 'left' }">
-		<Icon name="ri:qq-fill" />
-		<span>169994096</span>
-	</Tip>
+	<a
+	class="bilibili-link"
+	href="https://space.bilibili.com/3494364785412496"
+	target="_blank"
+	rel="noopener noreferrer"
+>
+	<Icon name="ant-design:bilibili-filled" />
+	<span>访问我的 Bilibili 主页</span>
+</a>
 </BlogWidget>
 </template>
 
@@ -32,9 +37,18 @@
 	}
 }
 
-.tip {
+.bilibili-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
 	font-size: 0.9em;
 	line-height: 2;
+	color: var(--c-text-2);
+	transition: color 0.2s;
+
+	&:hover {
+		color: var(--c-primary);
+	}
 }
 
 :deep(.bg-img).bg-img.bg-img {
