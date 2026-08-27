@@ -20,7 +20,7 @@ ProtectKernelModules=true
 ProtectControlGroups=true
 RestrictSUIDSGID=true
 LockPersonality=true
-CapabilityBoundingSet=
+CapabilityBoundingSet=CAP_SETUID CAP_SETGID CAP_AUDIT_WRITE
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 
 [Install]
