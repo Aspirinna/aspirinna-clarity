@@ -5,7 +5,7 @@ umask 077
 
 BASE_DIR="${PUBLISH_BASE_DIR:-/opt/obsidian-publish}"
 REPO_DIR="$BASE_DIR/repo"
-DB_DIR="$BASE_DIR/db"
+SETTINGS_FILE="$BASE_DIR/db/.livesync/settings.json"
 RUNS_DIR="$BASE_DIR/runs"
 LOCK_FILE="$BASE_DIR/publish.lock"
 LATEST_READY_FILE="$BASE_DIR/latest-ready"
@@ -32,7 +32,7 @@ exec 9>"$LOCK_FILE"
 flock -n 9 || fail '另一个发布任务正在运行'
 
 [[ -d "$REPO_DIR/.git" ]] || fail "Git 仓库不存在：$REPO_DIR"
-[[ -d "$DB_DIR" ]] || fail "LiveSync 数据目录不存在：$DB_DIR"
+[[ -f "$SETTINGS_FILE" ]] || fail "LiveSync 配置不存在：$SETTINGS_FILE"
 [[ "$(git -C "$REPO_DIR" branch --show-current)" == 'main' ]] || fail '服务器仓库当前不在 main 分支'
 [[ -z "$(git -C "$REPO_DIR" status --porcelain)" ]] || fail '服务器仓库存在未提交修改，请先处理'
 
@@ -43,18 +43,15 @@ git -C "$REPO_DIR" merge --ff-only origin/main
 BASE_COMMIT="$(git -C "$REPO_DIR" rev-parse HEAD)"
 [[ "$BASE_COMMIT" == "$(git -C "$REPO_DIR" rev-parse origin/main)" ]] || fail '服务器仓库含有尚未推送的提交'
 
-log '从远程 CouchDB 同步 LiveSync 本地数据库'
-docker run --rm \
-	-v "$DB_DIR:/data" \
-	"$LIVESYNC_IMAGE" sync
-
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)-$$"
 RUN_DIR="$RUNS_DIR/$RUN_ID"
+RUN_DB_DIR="$RUN_DIR/db"
 VAULT_DIR="$RUN_DIR/vault"
 SITE_DIR="$RUN_DIR/site"
 GENERATED_DIR="$RUN_DIR/generated-posts"
 
-install -d -m 700 "$VAULT_DIR" "$SITE_DIR"
+install -d -m 700 "$RUN_DB_DIR/.livesync" "$VAULT_DIR/Blog" "$SITE_DIR"
+cp "$SETTINGS_FILE" "$RUN_DB_DIR/.livesync/settings.json"
 printf '%s\n' 'preparing' > "$RUN_DIR/status"
 printf '%s\n' "$BASE_COMMIT" > "$RUN_DIR/base-commit"
 
@@ -64,11 +61,30 @@ on_error() {
 }
 trap on_error ERR
 
-log "生成不可变 Vault 快照：$RUN_ID"
+log "从 CouchDB 建立全新的只读发布数据库：$RUN_ID"
 docker run --rm \
-	-v "$DB_DIR:/data" \
-	-v "$VAULT_DIR:/vault" \
-	"$LIVESYNC_IMAGE" mirror /vault
+	-v "$RUN_DB_DIR:/data" \
+	"$LIVESYNC_IMAGE" sync
+
+log '列出数据库中的博客文章'
+docker run --rm \
+	-v "$RUN_DB_DIR:/data" \
+	"$LIVESYNC_IMAGE" ls Blog/ | tee "$RUN_DIR/livesync-list.txt"
+
+mapfile -t BLOG_FILES < <(
+	awk -F '\t' '$1 ~ /^Blog\/.*\.md$/ { print $1 }' "$RUN_DIR/livesync-list.txt"
+)
+[[ "${#BLOG_FILES[@]}" -gt 0 ]] || fail 'LiveSync 数据库中没有找到 Blog/*.md'
+
+log "只读导出 ${#BLOG_FILES[@]} 篇 Markdown 到 Vault 快照"
+for vault_path in "${BLOG_FILES[@]}"; do
+	[[ "$vault_path" != *'..'* ]] || fail "数据库中存在非法路径：$vault_path"
+	install -d "$(dirname "$VAULT_DIR/$vault_path")"
+	docker run --rm \
+		-v "$RUN_DB_DIR:/data" \
+		-v "$VAULT_DIR:/vault" \
+		"$LIVESYNC_IMAGE" pull "$vault_path" "/vault/$vault_path"
+done
 
 log '从当前 Git 提交导出隔离的构建目录'
 git -C "$REPO_DIR" archive --format=tar HEAD | tar -xf - -C "$SITE_DIR"
@@ -113,7 +129,7 @@ cat > "$RUN_DIR/summary.txt" <<EOF
 生成文章目录: $GENERATED_DIR
 EOF
 
-rm -rf -- "$SITE_DIR"
+rm -rf -- "$SITE_DIR" "$RUN_DB_DIR"
 printf '%s\n' 'ready' > "$RUN_DIR/status"
 printf '%s\n' "$RUN_DIR" > "$LATEST_READY_FILE.tmp"
 mv -f "$LATEST_READY_FILE.tmp" "$LATEST_READY_FILE"
