@@ -49,6 +49,9 @@ catalogs:
     ci-info:
       specifier: ^4.4.0
       version: 4.4.0
+    h3:
+      specifier: ^1.15.11
+      version: 1.15.11
     nuxt:
       specifier: ^4.4.8
       version: 4.4.8
@@ -184,6 +187,9 @@ catalogs:
     temporal-polyfill:
       specifier: ^1.0.1
       version: 1.0.1
+    yaml:
+      specifier: ^2.9.0
+      version: 2.9.0
 
 overrides:
   '@dxup/nuxt': ^0.5.3
@@ -258,6 +264,9 @@ importers:
       es-toolkit:
         specifier: catalog:util
         version: 1.48.1
+      h3:
+        specifier: catalog:framework
+        version: 1.15.11
       minisearch:
         specifier: catalog:util
         version: 7.2.0
@@ -373,6 +382,9 @@ importers:
       unrun:
         specifier: catalog:framework
         version: 0.3.1(synckit@0.11.13)
+      yaml:
+        specifier: catalog:util
+        version: 2.9.0
 
 packages:
 
