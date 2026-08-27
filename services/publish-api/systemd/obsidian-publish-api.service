@@ -1,0 +1,27 @@
+[Unit]
+Description=Obsidian blog publish API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=publisher-api
+Group=publisher-api
+EnvironmentFile=/etc/obsidian-publish-api.env
+ExecStart=/usr/bin/node /usr/local/lib/obsidian-publish-api/server.mjs serve
+Restart=on-failure
+RestartSec=3
+PrivateTmp=true
+PrivateDevices=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

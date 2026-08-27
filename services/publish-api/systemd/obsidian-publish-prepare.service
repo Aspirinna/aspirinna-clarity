@@ -1,0 +1,9 @@
+[Unit]
+Description=Prepare Obsidian blog release
+After=network-online.target docker.service
+Wants=network-online.target docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash /opt/obsidian-publish/repo/scripts/publish/server-prepare.sh
+TimeoutStartSec=45min

@@ -1,0 +1,3 @@
+publisher-api ALL=(root) NOPASSWD: /usr/bin/node /usr/local/lib/obsidian-publish-api/server.mjs internal-status
+publisher-api ALL=(root) NOPASSWD: /usr/bin/node /usr/local/lib/obsidian-publish-api/server.mjs internal-start prepare
+publisher-api ALL=(root) NOPASSWD: /usr/bin/node /usr/local/lib/obsidian-publish-api/server.mjs internal-start publish *

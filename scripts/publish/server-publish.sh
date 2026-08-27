@@ -9,6 +9,7 @@ RUNS_DIR="$BASE_DIR/runs"
 LOCK_FILE="$BASE_DIR/publish.lock"
 LATEST_READY_FILE="$BASE_DIR/latest-ready"
 MANIFEST_FILE="$REPO_DIR/.obsidian-publish-manifest"
+EXPECTED_RUN_ID="${1:-}"
 
 log() {
 	printf '[publish] %s\n' "$*"
@@ -32,6 +33,12 @@ RUN_DIR="$(realpath -e "$RUN_DIR")"
 REAL_RUNS_DIR="$(realpath -e "$RUNS_DIR")"
 [[ "$RUN_DIR" == "$REAL_RUNS_DIR/"* ]] || fail '发布批次路径不在 runs 目录内'
 [[ "$(cat "$RUN_DIR/status")" == 'ready' ]] || fail '这个发布批次不是 ready 状态'
+
+RUN_ID="$(basename "$RUN_DIR")"
+if [[ -n "$EXPECTED_RUN_ID" ]]; then
+	[[ "$EXPECTED_RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z-[0-9]+$ ]] || fail 'API 提供的发布批次编号格式不正确'
+	[[ "$RUN_ID" == "$EXPECTED_RUN_ID" ]] || fail '待确认批次已经变化，请重新检查后再发布'
+fi
 
 GENERATED_DIR="$RUN_DIR/generated-posts"
 BASE_COMMIT="$(cat "$RUN_DIR/base-commit")"
@@ -77,7 +84,6 @@ fi
 git -C "$REPO_DIR" config user.name 'Aspirinna Publisher'
 git -C "$REPO_DIR" config user.email 'aspirinna-publisher@users.noreply.github.com'
 
-RUN_ID="$(basename "$RUN_DIR")"
 git -C "$REPO_DIR" commit -m "publish: Obsidian content $RUN_ID"
 PUBLISH_COMMIT="$(git -C "$REPO_DIR" rev-parse HEAD)"
 printf '%s\n' "$PUBLISH_COMMIT" > "$RUN_DIR/publish-commit"
