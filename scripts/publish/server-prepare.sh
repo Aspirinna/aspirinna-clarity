@@ -14,6 +14,7 @@ LIVESYNC_IMAGE="${LIVESYNC_IMAGE:-aspirinna/livesync-cli:local}"
 BUILDER_IMAGE="${BUILDER_IMAGE:-aspirinna/clarity-builder:local}"
 PNPM_STORE_VOLUME="${PNPM_STORE_VOLUME:-clarity-pnpm-store}"
 NODE_MODULES_VOLUME="${NODE_MODULES_VOLUME:-clarity-node-modules}"
+SCRIPT_PATH="$REPO_DIR/scripts/publish/server-prepare.sh"
 
 log() {
 	printf '[prepare] %s\n' "$*"
@@ -24,7 +25,7 @@ fail() {
 	exit 1
 }
 
-for command in docker flock git realpath tar; do
+for command in awk docker flock git realpath sha256sum tar; do
 	command -v "$command" >/dev/null 2>&1 || fail "缺少命令：$command"
 done
 
@@ -38,8 +39,16 @@ flock -n 9 || fail '另一个发布任务正在运行'
 [[ -z "$(git -C "$REPO_DIR" status --porcelain)" ]] || fail '服务器仓库存在未提交修改，请先处理'
 
 log '更新服务器上的博客仓库'
+SCRIPT_HASH_BEFORE="$(sha256sum "$SCRIPT_PATH" | awk '{ print $1 }')"
 git -C "$REPO_DIR" fetch origin main
 git -C "$REPO_DIR" merge --ff-only origin/main
+SCRIPT_HASH_AFTER="$(sha256sum "$SCRIPT_PATH" | awk '{ print $1 }')"
+
+if [[ "$SCRIPT_HASH_BEFORE" != "$SCRIPT_HASH_AFTER" && "${PUBLISH_SCRIPT_RESTARTED:-0}" != '1' ]]; then
+	log '准备脚本已更新，重新执行仓库中的最新版本'
+	export PUBLISH_SCRIPT_RESTARTED=1
+	exec /usr/bin/bash "$SCRIPT_PATH"
+fi
 
 BASE_COMMIT="$(git -C "$REPO_DIR" rev-parse HEAD)"
 [[ "$BASE_COMMIT" == "$(git -C "$REPO_DIR" rev-parse origin/main)" ]] || fail '服务器仓库含有尚未推送的提交'
