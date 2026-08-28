@@ -12,6 +12,7 @@ const scriptPath = fileURLToPath(import.meta.url)
 const baseDirectory = process.env.PUBLISH_BASE_DIR ?? '/opt/obsidian-publish'
 const runsDirectory = `${baseDirectory}/runs`
 const latestReadyFile = `${baseDirectory}/latest-ready`
+const latestAttemptFile = `${baseDirectory}/latest-attempt`
 const prepareUnit = 'obsidian-publish-prepare.service'
 const runIdPattern = /^\d{8}T\d{6}Z-\d+$/
 
@@ -26,8 +27,8 @@ async function readOptional(path) {
 	}
 }
 
-async function readPublishStatus() {
-	const latest = await readOptional(latestReadyFile)
+async function readRunStatus(pointerFile) {
+	const latest = await readOptional(pointerFile)
 	if (!latest)
 		return { exists: false }
 
@@ -62,7 +63,11 @@ async function runCommand(command, args, timeout = 10_000) {
 async function internalStatus() {
 	if (process.getuid?.() !== 0)
 		throw new Error('internal-status must run as root')
-	process.stdout.write(`${JSON.stringify(await readPublishStatus())}\n`)
+	const [latest, attempt] = await Promise.all([
+		readRunStatus(latestReadyFile),
+		readRunStatus(latestAttemptFile),
+	])
+	process.stdout.write(`${JSON.stringify({ latest, attempt })}\n`)
 }
 
 async function internalStart(action, runId) {
@@ -78,7 +83,7 @@ async function internalStart(action, runId) {
 	if (action !== 'publish' || !runIdPattern.test(runId ?? ''))
 		throw new Error('Invalid internal action')
 
-	const status = await readPublishStatus()
+	const status = await readRunStatus(latestReadyFile)
 	if (!status.exists || status.runId !== runId || status.status !== 'ready')
 		throw new Error('The requested run is no longer ready to publish')
 
@@ -182,10 +187,15 @@ async function serve() {
 			if (request.method === 'GET' && url.pathname === '/v1/status') {
 				const publish = await privileged(['internal-status'])
 				const prepare = await unitStatus(prepareUnit)
-				const publishUnit = publish?.runId
-					? await unitStatus(`obsidian-publish-publish@${publish.runId}.service`)
+				const publishUnit = publish?.latest?.runId
+					? await unitStatus(`obsidian-publish-publish@${publish.latest.runId}.service`)
 					: null
-				send(response, 200, { prepare, publishUnit, latest: publish })
+				send(response, 200, {
+					prepare,
+					publishUnit,
+					latest: publish?.latest ?? { exists: false },
+					attempt: publish?.attempt ?? { exists: false },
+				})
 				return
 			}
 

@@ -9,6 +9,7 @@ PUBLISH_DB_DIR="${PUBLISH_DB_DIR:-$BASE_DIR/publisher-db}"
 RUNS_DIR="$BASE_DIR/runs"
 LOCK_FILE="$BASE_DIR/publish.lock"
 LATEST_READY_FILE="$BASE_DIR/latest-ready"
+LATEST_ATTEMPT_FILE="$BASE_DIR/latest-attempt"
 LIVESYNC_IMAGE="${LIVESYNC_IMAGE:-aspirinna/livesync-cli:local}"
 BUILDER_IMAGE="${BUILDER_IMAGE:-aspirinna/clarity-builder:local}"
 PNPM_STORE_VOLUME="${PNPM_STORE_VOLUME:-clarity-pnpm-store}"
@@ -52,6 +53,8 @@ GENERATED_DIR="$RUN_DIR/generated-posts"
 install -d -m 700 "$VAULT_DIR/Blog" "$SITE_DIR"
 printf '%s\n' 'preparing' > "$RUN_DIR/status"
 printf '%s\n' "$BASE_COMMIT" > "$RUN_DIR/base-commit"
+printf '%s\n' "$RUN_DIR" > "$LATEST_ATTEMPT_FILE.tmp"
+mv -f "$LATEST_ATTEMPT_FILE.tmp" "$LATEST_ATTEMPT_FILE"
 
 on_error() {
 	printf '%s\n' 'failed' > "$RUN_DIR/status"
@@ -99,8 +102,9 @@ docker run --rm \
 		set -eu
 		pnpm config set store-dir /pnpm/store
 		pnpm install --frozen-lockfile
+		pnpm prepare
 		pnpm publish:prepare /run/vault /run/generated-posts
-	cp -a /run/generated-posts/. content/posts/
+		cp -a /run/generated-posts/. content/posts/
 		pnpm lint
 		pnpm generate
 	'
