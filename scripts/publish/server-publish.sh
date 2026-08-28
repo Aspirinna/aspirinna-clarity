@@ -40,11 +40,19 @@ if [[ -n "$EXPECTED_RUN_ID" ]]; then
 	[[ "$RUN_ID" == "$EXPECTED_RUN_ID" ]] || fail '待确认批次已经变化，请重新检查后再发布'
 fi
 
-GENERATED_DIR="$RUN_DIR/generated-posts"
-BASE_COMMIT="$(cat "$RUN_DIR/base-commit")"
-[[ -d "$GENERATED_DIR" ]] || fail '待发布文章目录不存在'
+on_error() {
+	if [[ "$(cat "$RUN_DIR/status" 2>/dev/null || true)" != 'push-failed' ]]; then
+		printf '%s\n' 'publish-failed' > "$RUN_DIR/status"
+	fi
+	printf '[publish] 发布任务失败，批次现场保留在：%s\n' "$RUN_DIR" >&2
+}
+trap on_error ERR
 
-log '重新校验准备阶段生成的文章'
+GENERATED_DIR="$RUN_DIR/generated"
+BASE_COMMIT="$(cat "$RUN_DIR/base-commit")"
+[[ -d "$GENERATED_DIR" ]] || fail '待发布内容快照目录不存在'
+
+log '重新校验准备阶段生成的内容快照'
 (
 	cd "$GENERATED_DIR"
 	sha256sum -c "$RUN_DIR/generated.sha256"
@@ -97,5 +105,6 @@ if ! git -C "$REPO_DIR" push origin main; then
 fi
 
 printf '%s\n' 'published' > "$RUN_DIR/status"
+trap - ERR
 log "发布提交：$PUBLISH_COMMIT"
 log '服务器端发布完成，请到 GitHub Actions 查看正式部署结果'
