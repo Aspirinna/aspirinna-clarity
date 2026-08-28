@@ -4,8 +4,8 @@
     "name": "Aspirinna Clarity",
     "description": "基于 Nuxt 4 与 Nuxt Content 构建的个人博客，以及配套的自动发布流程。",
     "link": "https://github.com/Aspirinna/aspirinna-clarity",
-    "type": "website",
     "relation": "created",
+    "type": "website",
     "icon": "tabler:notebook"
   }
 ]
