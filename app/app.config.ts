@@ -113,6 +113,10 @@ export default defineAppConfig({
 			items: [
 				{ icon: 'tabler:files', text: '文章', url: '/' },
 				{ icon: 'tabler:bulb', text: '即刻', url: '/essays' },
+				{ icon: 'tabler:hash', text: '标签', url: '/tags' },
+				{ icon: 'tabler:movie', text: '番剧', url: '/anime' },
+				{ icon: 'tabler:device-gamepad-2', text: '游戏', url: '/games' },
+				{ icon: 'tabler:code', text: '项目', url: '/projects' },
 				{ icon: 'tabler:link', text: '友链', url: '/link' },
 				{ icon: 'tabler:archive', text: '归档', url: '/archive' },
 			],

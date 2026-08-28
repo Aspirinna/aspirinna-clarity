@@ -72,6 +72,8 @@ export default defineNuxtConfig({
 
 	nitro: {
 		prerender: {
+			// 外部数据源短暂不可用时，仍然生成其余静态页面
+			failOnError: false,
 			// 修复部分平台会在文章路径后添加 `/`，导致闪现 404 错误
 			// https://github.com/nuxt/content/issues/2378
 			autoSubfolderIndex: CLOUDFLARE_PAGES || NETLIFY ? false : undefined,
@@ -81,15 +83,23 @@ export default defineNuxtConfig({
 	// @keep-sorted
 	routeRules: {
 		...mapValues(redirectList, to => ({ redirect: { to, statusCode: 308 as const } })),
+		'/api/bilibili': { prerender: true, headers: { 'Content-Type': 'application/json' } },
 		'/api/stats': { prerender: true, headers: { 'Content-Type': 'application/json' } },
+		'/api/steam': { prerender: true, headers: { 'Content-Type': 'application/json' } },
 		'/atom.xml': { prerender: true, headers: { 'Content-Type': 'application/xml' } },
 		'/subscriptions.opml': { prerender: true, headers: { 'Content-Type': 'application/xml' } },
 	},
 
 	runtimeConfig: {
+		// Steam 聚合服务地址只在服务端使用，不会写入浏览器代码
+		steamApi: env.NUXT_STEAM_API_URL || '',
 		// @keep-sorted
 		public: {
 			arch,
+			// B站追番代理接口（可选，直连被风控时使用）
+			biliApi: env.NUXT_PUBLIC_BILI_API || '',
+			// B站 UID；追番列表需要设为公开
+			biliUid: env.NUXT_PUBLIC_BILI_UID || '349146247',
 			buildTime: Temporal.Now.zonedDateTimeISO().toString(),
 			// EdgeOne 检测暂时不可用
 			ci: env.TENCENTCLOUD_RUNENV === 'SCF' ? 'EdgeOne' : ciName || '',

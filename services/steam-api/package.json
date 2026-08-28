@@ -1,0 +1,12 @@
+{
+  "name": "aspirinna-steam-api",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "start": "node server.mjs"
+  }
+}
