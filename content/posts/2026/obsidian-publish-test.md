@@ -12,5 +12,5 @@ draft: false
 ---
 
 ## 引言
-测试图床以及obsidian插件
+测试图床以及obsidian插件噢噢噢噢
 ![20260828001030478.png](https://img.aspirinna.cloud/posts/20260828001030478.png)
