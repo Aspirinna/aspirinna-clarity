@@ -62,18 +62,20 @@ log '移除上一批由 Obsidian 发布器管理的文章'
 if [[ -f "$MANIFEST_FILE" ]]; then
 	while IFS= read -r managed_path; do
 		[[ -z "$managed_path" ]] && continue
-		[[ "$managed_path" == content/posts/* ]] || fail "清单中存在非法路径：$managed_path"
+		case "$managed_path" in
+			content/posts/*|app/generated/moments.json|app/generated/projects.json) ;;
+			*) fail "清单中存在非法路径：$managed_path" ;;
+		esac
 		[[ "$managed_path" != *'..'* ]] || fail "清单中存在非法路径：$managed_path"
 		rm -f -- "$REPO_DIR/$managed_path"
 	done < "$MANIFEST_FILE"
 fi
 
-log '把本批次文章写入博客仓库'
-install -d "$REPO_DIR/content/posts"
-cp -a "$GENERATED_DIR/." "$REPO_DIR/content/posts/"
+log '把本批次内容快照写入博客仓库'
+cp -a "$GENERATED_DIR/." "$REPO_DIR/"
 cp "$RUN_DIR/managed-files.txt" "$MANIFEST_FILE"
 
-git -C "$REPO_DIR" add -A -- content/posts .obsidian-publish-manifest
+git -C "$REPO_DIR" add -A -- content/posts app/generated/moments.json app/generated/projects.json .obsidian-publish-manifest
 
 if git -C "$REPO_DIR" diff --cached --quiet; then
 	printf '%s\n' 'no-changes' > "$RUN_DIR/status"

@@ -175,6 +175,8 @@ function storeLink(game: SteamGame) {
 		</section>
 	</template>
 </div>
+
+<PostComment />
 </template>
 
 <style lang="scss" scoped>
